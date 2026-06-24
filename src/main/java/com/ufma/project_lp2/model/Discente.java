@@ -3,13 +3,23 @@ package com.ufma.project_lp2.model;
 
 import com.ufma.project_lp2.model.enums.Papel;
 import com.ufma.project_lp2.model.enums.StatusMatricula;
+import jakarta.persistence.*;
 
+@Entity
 public class Discente extends Usuario{
 
     private String matricula;
     private int semestreAtual;
+
+    @ManyToOne
+    @JoinColumn(name = "curso_id")
     private Curso curso;
+
+    @Enumerated(EnumType.STRING)
     private StatusMatricula statusMatricula;
+
+    public Discente() {
+    }
 
     public Discente(String nome, String email,
                     String senha, Papel papel,

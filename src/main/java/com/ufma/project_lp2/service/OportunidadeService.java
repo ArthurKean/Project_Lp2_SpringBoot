@@ -8,7 +8,7 @@ import com.ufma.project_lp2.model.Usuario;
 import com.ufma.project_lp2.model.enums.Papel;
 import com.ufma.project_lp2.model.enums.StatusInscricao;
 import com.ufma.project_lp2.model.enums.StatusOportunidade;
-import org.jvnet.hk2.annotations.Service;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -6,25 +6,52 @@ import com.ufma.project_lp2.model.enums.Modalidade;
 import com.ufma.project_lp2.model.enums.StatusInscricao;
 import com.ufma.project_lp2.model.enums.StatusOportunidade;
 import com.ufma.project_lp2.model.enums.TipoOportunidade;
+import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
 public class Oportunidade {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String titulo;
     private String descricao;
+
+    @Enumerated(EnumType.STRING)
     private TipoOportunidade tipo;
+
+    @Enumerated(EnumType.STRING)
     private Modalidade modalidade;
+
     private int carga_horaria;
     private int vagas;
+
+    @Enumerated(EnumType.STRING)
     private StatusOportunidade status;
+
     private LocalDate inicio;
     private LocalDate fim;
+
+    @ManyToOne
+    @JoinColumn(name = "autor_id")
     private Usuario autor;
+
+    @ManyToOne
+    @JoinColumn(name = "responsavel_id")
     private Docente responsavel;
+
     private String planoAtividades;
+
+    @OneToMany(mappedBy = "oportunidade")
     private List<Inscricao> inscricoes;
+
+    public Oportunidade(){
+    }
 
     public Oportunidade(String titulo, String descricao,
                         TipoOportunidade tipo, Modalidade modalidade,
@@ -43,6 +70,14 @@ public class Oportunidade {
         this.responsavel = responsavel;
         this.status = StatusOportunidade.RASCUNHO;
         this.inscricoes = new ArrayList<>();
+    }
+
+
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTitulo() {

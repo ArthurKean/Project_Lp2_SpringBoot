@@ -5,7 +5,7 @@ import com.ufma.project_lp2.model.Discente;
 import com.ufma.project_lp2.model.Inscricao;
 import com.ufma.project_lp2.model.Oportunidade;
 import com.ufma.project_lp2.model.enums.StatusInscricao;
-import org.jvnet.hk2.annotations.Service;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

@@ -5,7 +5,8 @@ import com.ufma.project_lp2.model.Aproveitamento;
 import com.ufma.project_lp2.model.Discente;
 import com.ufma.project_lp2.model.Usuario;
 import com.ufma.project_lp2.model.enums.StatusAproveitamento;
-import org.jvnet.hk2.annotations.Service;
+import org.springframework.stereotype.Service;
+
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;

@@ -2,13 +2,30 @@ package com.ufma.project_lp2.model;
 
 
 import com.ufma.project_lp2.model.enums.StatusInscricao;
+import jakarta.persistence.*;
 
+@Entity
 public class Inscricao {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "oportunidade_id")
     private Oportunidade oportunidade;
+
+    @ManyToOne
+    @JoinColumn(name = "discente_id")
     private Discente discente;
+
+    @Enumerated(EnumType.STRING)
     private StatusInscricao status;
+
     private String motivacao;
+
+    public Inscricao(){
+    }
 
     public Inscricao(Oportunidade oportunidade, Discente discente, String motivacao) {
         this.oportunidade = oportunidade;
@@ -25,6 +42,13 @@ public class Inscricao {
     public void rejeitar() {
         this.status = StatusInscricao.REJEITADO;
         System.out.println("Inscrição rejeitada.");
+    }
+
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Oportunidade getOportunidade() {

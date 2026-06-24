@@ -2,16 +2,30 @@ package com.ufma.project_lp2.model;
 
 
 import com.ufma.project_lp2.model.enums.Papel;
+import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Usuario {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String nome;
     private String email;
     private String senha;
+
+    @Enumerated(EnumType.STRING)
     private Papel papel;
+
     private boolean ativo;
+
+    public Usuario(){
+    }
 
     public Usuario(String nome,
                    String email,
@@ -22,6 +36,13 @@ public abstract class Usuario {
         this.senha = senha;
         this.papel = papel;
         this.ativo = true;
+    }
+
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getNome() {

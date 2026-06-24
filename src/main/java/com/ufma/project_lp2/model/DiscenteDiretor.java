@@ -4,15 +4,25 @@ package com.ufma.project_lp2.model;
 import com.ufma.project_lp2.model.enums.Modalidade;
 import com.ufma.project_lp2.model.enums.Papel;
 import com.ufma.project_lp2.model.enums.TipoOportunidade;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 import java.time.LocalDate;
 
+@Entity
 public class DiscenteDiretor extends Discente {
 
+    @ManyToOne
+    @JoinColumn(name = "grupo_id")
     private Grupo grupo;
+
     private String cargo;
     private LocalDate dataInicio;
     private LocalDate dataFim;
+
+    public DiscenteDiretor(){
+    }
 
     public DiscenteDiretor(String nome, String email, String senha,
                            Papel papel, String matricula, int semestre_atual,

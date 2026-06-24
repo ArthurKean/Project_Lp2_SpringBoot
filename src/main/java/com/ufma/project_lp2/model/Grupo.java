@@ -3,6 +3,7 @@ package com.ufma.project_lp2.model;
 
 import com.ufma.project_lp2.model.enums.Cargos;
 import com.ufma.project_lp2.model.enums.StatusGrupo;
+import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -10,18 +11,41 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Entity
 public class Grupo {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String nome;
     private String tipo;
     private String email;
     private String descricao;
+
+    @Enumerated(EnumType.STRING)
     private StatusGrupo status;
+
+    @ManyToOne
+    @JoinColumn(name = "responsavel_id")
     private Docente responsavel;
+
     private LocalDate dataCriacao;
-    
+
+    @ElementCollection
+    @CollectionTable(name = "grupo_membros", joinColumns = @JoinColumn(name = "grupo_id"))
+    @MapKeyJoinColumn(name = "usuario_id")
+    @Column(name = "cargo")
+    @Enumerated(EnumType.STRING)
     private Map<Usuario, Cargos> membros;
+
+    @ElementCollection
+    @CollectionTable(name = "grupo_historico", joinColumns = @JoinColumn(name = "grupo_id"))
+    @Column(name = "registro")
     private List<String> historicoUsuarios;
+
+    public Grupo(){
+    }
 
     public Grupo(String nome, String tipo,
                  String email, String descricao,
@@ -93,6 +117,13 @@ public class Grupo {
     public void alterarStatus(StatusGrupo novoStatus) {
         this.status = novoStatus;
         System.out.println("O status do grupo '" + nome + "' foi alterado para: " + novoStatus);
+    }
+
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getNome() { return nome; }

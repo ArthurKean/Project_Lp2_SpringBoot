@@ -2,7 +2,7 @@ package com.ufma.project_lp2.model;
 
 
 import com.ufma.project_lp2.model.enums.StatusMatricula;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,12 +10,25 @@ import java.util.List;
 @Entity
 public class Curso {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String nome;
     private int codigo;
     private int cargaHoraria;
     private String versaoPpc;
+
+    @OneToMany(mappedBy = "curso")
     private List<Discente> discentes;
+
+    @ElementCollection
+    @CollectionTable(name ="historico_ppc", joinColumns = @JoinColumn(name = "curso_id"))
+    @Column(name = "registro")
     private List<String> historicoPpc;
+
+    public Curso(){
+    }
 
     public Curso(String nome,
                  int codigo,
@@ -75,6 +88,13 @@ public class Curso {
             return;
         }
         this.discentes.add(discente);
+    }
+
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getNome() {

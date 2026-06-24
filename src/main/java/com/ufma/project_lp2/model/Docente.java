@@ -4,13 +4,18 @@ package com.ufma.project_lp2.model;
 import com.ufma.project_lp2.model.enums.Modalidade;
 import com.ufma.project_lp2.model.enums.Papel;
 import com.ufma.project_lp2.model.enums.TipoOportunidade;
+import jakarta.persistence.Entity;
 
 import java.time.LocalDate;
 
+@Entity
 public class Docente extends Usuario {
 
     private String siape;
     private String departamento;
+
+    public Docente(){
+    }
 
     public Docente(String nome, String email,
             String senha, Papel papel,

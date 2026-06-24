@@ -4,7 +4,7 @@ package com.ufma.project_lp2.service;
 import com.ufma.project_lp2.model.Curso;
 import com.ufma.project_lp2.model.Discente;
 import com.ufma.project_lp2.model.enums.StatusMatricula;
-import org.jvnet.hk2.annotations.Service;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
