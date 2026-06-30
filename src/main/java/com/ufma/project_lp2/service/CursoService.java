@@ -6,17 +6,17 @@ import com.ufma.project_lp2.model.Discente;
 import com.ufma.project_lp2.model.enums.StatusMatricula;
 import org.springframework.stereotype.Service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import com.ufma.project_lp2.repository.CursoRepository;
+
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class CursoService {
 
-    private List<Curso> bancoDeCursos;
-
-    public CursoService() {
-        this.bancoDeCursos = new ArrayList<>();
-    }
+    @Autowired
+    private CursoRepository repository;
 
     public void cadastrarCurso(Curso curso) {
         if (curso == null) {
@@ -27,12 +27,12 @@ public class CursoService {
             System.out.println("Já existe um curso com o código " + curso.getCodigo() + " cadastrado no sistema");
             return;
         }
-        bancoDeCursos.add(curso);
+        repository.save(curso);
         System.out.println("O curso '" + curso.getNome() + "' (PPC Versão: " + curso.getVersaoPpc() + ") foi cadastrado com sucesso");
     }
 
     public Curso buscarPorCodigo(int codigo) {
-        for (Curso c : bancoDeCursos) {
+        for (Curso c : repository.findAll()) {
             if (c.getCodigo() == codigo) {
                 return c;
             }
@@ -48,6 +48,7 @@ public class CursoService {
         }
         System.out.println("REVISÃO INSTITUCIONAL: Iniciando atualização do PPC do curso '" + curso.getNome() + "'...");
         curso.atualizarPPC(novasCargaHoraria, novaVersao); // Chama o método da classe Curso
+        repository.save(curso);
         System.out.println("Atualização do PPC concluída no sistema");
     }
 
@@ -71,13 +72,14 @@ public class CursoService {
 
     public List<Curso> listarTodos() {
         System.out.println("CATÁLOGO DE CURSOS UFMA:");
-        if (bancoDeCursos.isEmpty()) {
+        List<Curso> todos = repository.findAll();
+        if (todos.isEmpty()) {
             System.out.println("Nenhum curso cadastrado no momento");
         }
-        for (Curso c : bancoDeCursos) {
+        for (Curso c : todos) {
             System.out.println("- [" + c.getCodigo() + "] " + c.getNome() + " | PPC: " + c.getVersaoPpc() + " | Carga Horária: " + c.getCargaHoraria() + "h");
         }
-        return new ArrayList<>(bancoDeCursos);
+        return todos;
     }
 
     public boolean removerCurso(int codigo) {
@@ -86,7 +88,7 @@ public class CursoService {
             System.out.println("Curso com código " + codigo + " não encontrado");
             return false;
         }
-        bancoDeCursos.remove(curso);
+        repository.delete(curso);
         System.out.println("O curso '" + curso.getNome() + "' foi removido do sistema");
         return true;
     }
@@ -110,6 +112,7 @@ public class CursoService {
         }
         
         curso.adicionarDiscente(discente);
+        repository.save(curso);
         System.out.println("Matrícula confirmada! O aluno '" + discente.getNome() + "' está oficialmente matriculado no curso '" + curso.getNome() + "'.");
     }
 

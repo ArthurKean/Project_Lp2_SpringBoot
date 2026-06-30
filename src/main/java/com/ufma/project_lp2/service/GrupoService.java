@@ -9,6 +9,9 @@ import com.ufma.project_lp2.model.enums.Cargos;
 import com.ufma.project_lp2.model.enums.StatusGrupo;
 import org.springframework.stereotype.Service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import com.ufma.project_lp2.repository.GrupoRepository;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,15 +20,12 @@ import java.util.Objects;
 @Service
 public class GrupoService {
 
-    private List<Grupo> bancoDeGrupos;
-
-    public GrupoService() {
-        this.bancoDeGrupos = new ArrayList<>();
-    }
+    @Autowired
+    private GrupoRepository repository;
 
     public void registrarGrupo(Grupo grupo) {
         if (grupo != null) {
-            bancoDeGrupos.add(grupo);
+            repository.save(grupo);
             System.out.println("O grupo '" + grupo.getNome() + "' foi registrado no sistema.");
         } else {
             System.out.println("Tentativa de registrar grupo inválido.");
@@ -35,6 +35,7 @@ public class GrupoService {
     public void aprovarGrupo(Grupo grupo) {
         if (grupo != null) {
             grupo.alterarStatus(StatusGrupo.ATIVO);
+            repository.save(grupo);
             System.out.println("O grupo '" + grupo.getNome() + "' foi formalmente APROVADO.");
         }
     }
@@ -42,6 +43,7 @@ public class GrupoService {
     public void adicionarMembro(Grupo grupo, Usuario membro) {
         if (grupo != null && membro != null) {
             grupo.adicionarMembro(membro);
+            repository.save(grupo);
         } else {
             System.out.println("Grupo ou Usuário inválido para adição.");
         }
@@ -59,13 +61,14 @@ public class GrupoService {
         }
 
         grupo.atribuirCargo(discente, cargo);
+        repository.save(grupo);
     }
 
     public List<Grupo> listarGruposAtivos() {
         System.out.println("CATÁLOGO DE GRUPOS ATIVOS:");
         List<Grupo> ativos = new ArrayList<>();
         
-        for (Grupo g : bancoDeGrupos) {
+        for (Grupo g : repository.findAll()) {
             if (g.getStatus() == StatusGrupo.ATIVO) {
                 ativos.add(g);
                 System.out.println("- Grupo: " + g.getNome() + " | Área: " + g.getTipo() + " | Professor Chefe: " + g.getResponsavel().getNome());
@@ -76,7 +79,7 @@ public class GrupoService {
 
     public void listarTodosOsGrupos() {
         System.out.println("LISTA DE TODOS OS GRUPOS (Incluindo Inativos):");
-        for (Grupo g : bancoDeGrupos) {
+        for (Grupo g : repository.findAll()) {
             System.out.println("Grupo: " + g.getNome() + " | Status: " + g.getStatus());
         }
     }
@@ -86,7 +89,7 @@ public class GrupoService {
 
     }
     public void listarUsuariosdeUmGrupo(String listGrupo){
-        for(Grupo g: bancoDeGrupos) {
+        for(Grupo g: repository.findAll()) {
             if(g.getNome().equalsIgnoreCase(listGrupo)){
                 g.listarMembros();
                 return;
@@ -96,7 +99,7 @@ public class GrupoService {
     }
 
     public Grupo buscarGrupoPorNome(String nome){
-        for(Grupo g: bancoDeGrupos){
+        for(Grupo g: repository.findAll()){
             if(g.getNome().equalsIgnoreCase(nome)){
                 return g;
             }

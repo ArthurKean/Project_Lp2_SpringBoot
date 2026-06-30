@@ -7,21 +7,21 @@ import com.ufma.project_lp2.model.Usuario;
 import com.ufma.project_lp2.model.enums.StatusInscricao;
 import org.springframework.stereotype.Service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import com.ufma.project_lp2.repository.UsuarioRepository;
+
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class UsuarioService {
 
-    private List<Usuario> bancoDeUsuarios;
-
-    public UsuarioService() {
-        this.bancoDeUsuarios = new ArrayList<>();
-    }
+    @Autowired
+    private UsuarioRepository repository;
 
     public void registrarUsuario(Usuario usuario) {
         if (usuario != null) {
-            bancoDeUsuarios.add(usuario);
+            repository.save(usuario);
             System.out.println("Usuario '" + usuario.getNome() + "' cadastrado no sistema com sucesso!");
         } else {
             System.out.println("Tentativa de cadastrar um usuário que não pode!");
@@ -30,14 +30,15 @@ public class UsuarioService {
 
     public List<Usuario> listarUsuarios() {
         System.out.println("LISTA DE USUARIOS REGISTRADOS:");
-        for (Usuario u : bancoDeUsuarios) {
+        List<Usuario> todos = repository.findAll();
+        for (Usuario u : todos) {
             System.out.println("Nome: " + u.getNome() + " | Email: " + u.getEmail() + " | Papel: " + u.getPapel());
         }
-        return bancoDeUsuarios;
+        return todos;
     }
 
     public Usuario buscarPorEmail(String email) {
-        for (Usuario u : bancoDeUsuarios) {
+        for (Usuario u : repository.findAll()) {
             if (u.getEmail().equalsIgnoreCase(email)) {
                 return u;
             }
@@ -66,6 +67,7 @@ public class UsuarioService {
         Usuario u = buscarPorEmail(email);
         if (u != null) {
             u.mudarSenha(novaSenha);
+            repository.save(u);
             System.out.println("Senha do usuário '" + email + "' foi alterada com sucesso!");
         } else {
             System.out.println("Usuário não encontrado para alterar senha!");
@@ -76,6 +78,7 @@ public class UsuarioService {
         Usuario u = buscarPorEmail(emailDoUsuario);
         if (u != null) {
             u.setAtivo(false);
+            repository.save(u);
             System.out.println("O perfil da conta '" + emailDoUsuario + "' foi desativado/suspenso no sistema!");
         } else {
             System.out.println("Usuário não encontrado para desativação!");
@@ -108,7 +111,7 @@ public class UsuarioService {
     public List<Discente> listarDiscentes() {
         System.out.println("LISTA APENAS DE DISCENTES:");
         List<Discente> discentes = new ArrayList<>();
-        for (Usuario u : bancoDeUsuarios) {
+        for (Usuario u : repository.findAll()) {
             if (u instanceof Discente) {
                 Discente d = (Discente) u;
                 discentes.add(d);

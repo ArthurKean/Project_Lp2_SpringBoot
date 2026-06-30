@@ -8,6 +8,9 @@ import com.ufma.project_lp2.model.enums.StatusAproveitamento;
 import org.springframework.stereotype.Service;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
+import com.ufma.project_lp2.repository.AproveitamentoRepository;
+
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -16,15 +19,12 @@ import java.util.List;
 @Service
 public class AproveitamentoService {
 
-    private List<Aproveitamento> bancoDeSolicitacoes;
-
-    public AproveitamentoService() {
-        this.bancoDeSolicitacoes = new ArrayList<>();
-    }
+    @Autowired
+    private AproveitamentoRepository repository;
 
     public void registrarAproveitamento(Aproveitamento solicitacao) {
         if (solicitacao != null) {
-            bancoDeSolicitacoes.add(solicitacao);
+            repository.save(solicitacao);
             System.out.println("A solicitação de aproveitamento de '" + solicitacao.getDiscente().getNome() + "' foi recebida e está PENDENTE.");
         } else {
             System.out.println("Erro: Requerimento inválido.");
@@ -35,7 +35,7 @@ public class AproveitamentoService {
         System.out.println("PAINEL DE APROVEITAMENTOS (PENDENTES):");
         List<Aproveitamento> pendentes = new ArrayList<>();
         
-        for (Aproveitamento ap : bancoDeSolicitacoes) {
+        for (Aproveitamento ap : repository.findAll()) {
             if (ap.getStatus() == StatusAproveitamento.PENDENTE) {
                 pendentes.add(ap);
                 System.out.println("- Aluno: " + ap.getDiscente().getNome() + " | Horas: " + ap.getHoras() + "h | Data: " + ap.getDataSolicitacao());
@@ -52,14 +52,15 @@ public class AproveitamentoService {
 
         aproveitamento.setStatus(StatusAproveitamento.APROVADO);
         aproveitamento.setAvaliador(avaliador);
+        repository.save(aproveitamento);
         System.out.println("Aproveitamento de " + aproveitamento.getHoras() + "h aprovado para '" + aproveitamento.getDiscente().getNome() + "' pelo avaliador " + avaliador.getNome());
         return true;
     }
 
     public int calcularHorasAprovadas(Discente discente) {
         int total = 0;
-        for (Aproveitamento ap : bancoDeSolicitacoes) {
-            if (ap.getDiscente().equals(discente) && ap.getStatus() == StatusAproveitamento.APROVADO) {
+        for (Aproveitamento ap : repository.findAll()) {
+            if (ap.getDiscente() != null && ap.getDiscente().getId().equals(discente.getId()) && ap.getStatus() == StatusAproveitamento.APROVADO) {
                 total += ap.getHoras();
             }
         }
@@ -80,6 +81,7 @@ public class AproveitamentoService {
         aproveitamento.setStatus(StatusAproveitamento.INDEFERIDO);
         aproveitamento.setAvaliador(avaliador);
         aproveitamento.setMotivo_rejeicao(motivo);
+        repository.save(aproveitamento);
         System.out.println("Aproveitamento do aluno '" + aproveitamento.getDiscente().getNome() + "' foi REJEITADO. Motivo: " + motivo);
         return true;
     }
@@ -90,6 +92,7 @@ public class AproveitamentoService {
             aproveitamento.setStatus(StatusAproveitamento.PENDENTE);
             aproveitamento.setMotivo_rejeicao(null);
             aproveitamento.setDataSolicitacao(LocalDate.now());
+            repository.save(aproveitamento);
             System.out.println("A solicitação do aluno '" + aproveitamento.getDiscente().getNome() + "' foi atualizada e reenviada para análise.");
             return true;
         }

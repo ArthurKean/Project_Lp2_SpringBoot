@@ -9,21 +9,21 @@ import com.ufma.project_lp2.model.enums.StatusInscricao;
 import org.springframework.stereotype.Service;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
+import com.ufma.project_lp2.repository.CertificadoRepository;
+
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class CertificadoService {
 
-    private List<Certificado> cartorioInstitucional;
-
-    public CertificadoService() {
-        this.cartorioInstitucional = new ArrayList<>();
-    }
+    @Autowired
+    private CertificadoRepository repository;
 
     public void guardarRegistroDeCertificadoOficial(Certificado certificado) {
         if (certificado != null) {
-            cartorioInstitucional.add(certificado);
+            repository.save(certificado);
             System.out.println("Certificado de '" + certificado.getDiscente().getNome() + "' arquivado com sucesso no cartório institucional.");
         }
     }
@@ -32,8 +32,8 @@ public class CertificadoService {
         System.out.println("MEUS CERTIFICADOS (ALUNO: " + alunoLogado.getNome() + "):");
         List<Certificado> meusCertificados = new ArrayList<>();
         
-        for (Certificado c : cartorioInstitucional) {
-            if (c.getDiscente() != null && c.getDiscente().equals(alunoLogado)) {
+        for (Certificado c : repository.findAll()) {
+            if (c.getDiscente() != null && c.getDiscente().getId().equals(alunoLogado.getId())) {
                 meusCertificados.add(c);
                 System.out.println("- Documento: " + c.getOportunidade().getTitulo() + " | Validação: " + c.getUuidHash());
             }
@@ -51,7 +51,7 @@ public class CertificadoService {
 
                 Certificado cert = new Certificado(inscricao.getDiscente(), oportunidadeConcluida, cargaHoraria, pathDoc);
 
-                cartorioInstitucional.add(cert);
+                repository.save(cert);
                 lote.add(cert);
                 
                 System.out.println("- Certificado emitido para: " + inscricao.getDiscente().getNome() + " | Hash: " + cert.getUuidHash());
@@ -63,10 +63,11 @@ public class CertificadoService {
 
     public boolean consultarAutenticidadeNaUFMA(String codigoDeHash) {
         System.out.println("\nSISTEMA DE VALIDAÇÃO UFMA - Consultando: " + codigoDeHash);
-        for (Certificado c : cartorioInstitucional) {
+        for (Certificado c : repository.findAll()) {
             if (c.getUuidHash().equals(codigoDeHash)) {
                 System.out.println("Certificado VÁLIDO. Pertence ao aluno: " + c.getDiscente().getNome());
                 c.gerarQRCode();
+                repository.save(c);
                 return true;
             }
         }
