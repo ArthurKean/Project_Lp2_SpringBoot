@@ -19,12 +19,14 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository repository;
 
-    public void registrarUsuario(Usuario usuario) {
+    public Usuario registrarUsuario(Usuario usuario) {
         if (usuario != null) {
-            repository.save(usuario);
+            Usuario salvo = repository.save(usuario);
             System.out.println("Usuario '" + usuario.getNome() + "' cadastrado no sistema com sucesso!");
+            return salvo;
         } else {
             System.out.println("Tentativa de cadastrar um usuário que não pode!");
+            return null;
         }
     }
 
@@ -46,6 +48,10 @@ public class UsuarioService {
         return null;
     }
 
+    public Usuario buscarPorId(Long id) {
+        return repository.findById(id).orElse(null);
+    }
+
     public Usuario realizarLogin(String email, String senha) {
         System.out.println("Consultando o banco de dados" + email + "'...");
         Usuario u = buscarPorEmail(email);
@@ -63,40 +69,44 @@ public class UsuarioService {
         return null;
     }
 
-    public void mudarSenha(String email, String novaSenha) {
+    public Usuario mudarSenha(String email, String novaSenha) {
         Usuario u = buscarPorEmail(email);
         if (u != null) {
             u.mudarSenha(novaSenha);
-            repository.save(u);
+            Usuario salvo = repository.save(u);
             System.out.println("Senha do usuário '" + email + "' foi alterada com sucesso!");
+            return salvo;
         } else {
             System.out.println("Usuário não encontrado para alterar senha!");
+            return null;
         }
     }
 
-    public void desativarUsuario(String emailDoUsuario) {
+    public Usuario desativarUsuario(String emailDoUsuario) {
         Usuario u = buscarPorEmail(emailDoUsuario);
         if (u != null) {
             u.setAtivo(false);
-            repository.save(u);
+            Usuario salvo = repository.save(u);
             System.out.println("O perfil da conta '" + emailDoUsuario + "' foi desativado/suspenso no sistema!");
+            return salvo;
         } else {
             System.out.println("Usuário não encontrado para desativação!");
+            return null;
         }
     }
 
-    public void substituirParticipante(Inscricao atual, Inscricao nova, String justificativa) {
+    public String substituirParticipante(Inscricao atual, Inscricao nova, String justificativa) {
         if (atual == null || nova == null) {
             System.out.println("Erro: inscrições inválidas.");
-            return;
+            return "Erro: inscrições inválidas.";
         }
         if (!atual.getOportunidade().equals(nova.getOportunidade())) {
             System.out.println("Erro: inscrições de oportunidades diferentes.");
-            return;
+            return "Erro: inscrições de oportunidades diferentes.";
         }
         if (atual.getStatus() != StatusInscricao.APROVADO) {
             System.out.println("Erro: participante atual não está aprovado.");
-            return;
+            return "Erro: participante atual não está aprovado.";
         }
 
         atual.setStatus(StatusInscricao.CANCELADO);
@@ -106,6 +116,7 @@ public class UsuarioService {
         System.out.println("Removido: " + atual.getDiscente().getNome());
         System.out.println("Adicionado: " + nova.getDiscente().getNome());
         System.out.println("Justificativa: " + justificativa);
+        return "Substituição realizada com sucesso!";
     }
 
     public List<Discente> listarDiscentes() {

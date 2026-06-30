@@ -21,11 +21,13 @@ public class CertificadoService {
     @Autowired
     private CertificadoRepository repository;
 
-    public void guardarRegistroDeCertificadoOficial(Certificado certificado) {
+    public Certificado guardarRegistroDeCertificadoOficial(Certificado certificado) {
         if (certificado != null) {
-            repository.save(certificado);
+            Certificado salvo = repository.save(certificado);
             System.out.println("Certificado de '" + certificado.getDiscente().getNome() + "' arquivado com sucesso no cartório institucional.");
+            return salvo;
         }
+        return null;
     }
 
     public List<Certificado> listarMeusCertificados(Discente alunoLogado) {

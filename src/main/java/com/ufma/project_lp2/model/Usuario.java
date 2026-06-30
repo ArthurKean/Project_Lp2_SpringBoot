@@ -22,7 +22,7 @@ public abstract class Usuario {
     @Enumerated(EnumType.STRING)
     private Papel papel;
 
-    private boolean ativo;
+    private boolean ativo = true;
 
     public Usuario(){
     }

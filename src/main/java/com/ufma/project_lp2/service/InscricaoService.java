@@ -30,40 +30,51 @@ public class InscricaoService {
         return novaInscricao;
     }
 
-    public void cancelarInscricao(Inscricao inscricao) {
+    public Inscricao cancelarInscricao(Inscricao inscricao) {
         if (inscricao != null) {
             inscricao.cancelar();
-            repository.save(inscricao);
+            Inscricao salvo = repository.save(inscricao);
             System.out.println("A inscrição do aluno '" + inscricao.getDiscente().getNome() + "' foi cancelada.");
+            return salvo;
         } else {
             System.out.println("Inscrição não encontrada para cancelamento.");
+            return null;
         }
     }
 
-    public void aprovarInscricao(Inscricao inscricao) {
+    public Inscricao aprovarInscricao(Inscricao inscricao) {
         if (inscricao != null) {
             String dataAprovacao = LocalDate.now().toString();
             inscricao.aprovar(dataAprovacao);
-            repository.save(inscricao);
+            Inscricao salvo = repository.save(inscricao);
             System.out.println("O coordenadorAPROVOU a inscrição de '" + inscricao.getDiscente().getNome() + "'.");
+            return salvo;
         }
+        return null;
     }
 
-    public void rejeitarInscricao(Inscricao inscricao) {
+    public Inscricao rejeitarInscricao(Inscricao inscricao) {
         if (inscricao != null) {
             inscricao.rejeitar();
-            repository.save(inscricao);
+            Inscricao salvo = repository.save(inscricao);
             System.out.println("A inscrição de '" + inscricao.getDiscente().getNome() + "' foi REJEITADA.");
+            return salvo;
         }
+        return null;
     }
 
-    public void substituirParticipante(Inscricao inscricao, Discente novoDiscente) {
+    public Inscricao substituirParticipante(Inscricao inscricao, Discente novoDiscente) {
         if (inscricao != null && novoDiscente != null) {
             System.out.println("Substituindo o participante '" + inscricao.getDiscente().getNome() + "' por '" + novoDiscente.getNome() + "'.");
             inscricao.setDiscente(novoDiscente);
             inscricao.setStatus(StatusInscricao.PENDENTE);
-            repository.save(inscricao);
+            return repository.save(inscricao);
         }
+        return null;
+    }
+
+    public Inscricao buscarPorId(Long id) {
+        return repository.findById(id).orElse(null);
     }
 
     public List<Inscricao> listarInscritos(Oportunidade oportunidade) {

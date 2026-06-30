@@ -4,6 +4,7 @@ package com.ufma.project_lp2.model;
 import com.ufma.project_lp2.model.enums.Cargos;
 import com.ufma.project_lp2.model.enums.StatusGrupo;
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -32,19 +33,23 @@ public class Grupo {
 
     private LocalDate dataCriacao;
 
+    @JsonIgnore
     @ElementCollection
     @CollectionTable(name = "grupo_membros", joinColumns = @JoinColumn(name = "grupo_id"))
     @MapKeyJoinColumn(name = "usuario_id")
     @Column(name = "cargo")
     @Enumerated(EnumType.STRING)
-    private Map<Usuario, Cargos> membros;
+    private Map<Usuario, Cargos> membros = new HashMap<>();
 
+    @JsonIgnore
     @ElementCollection
     @CollectionTable(name = "grupo_historico", joinColumns = @JoinColumn(name = "grupo_id"))
     @Column(name = "registro")
-    private List<String> historicoUsuarios;
+    private List<String> historicoUsuarios = new ArrayList<>();
 
     public Grupo(){
+        this.status = StatusGrupo.ATIVO;
+        this.dataCriacao = LocalDate.now();
     }
 
     public Grupo(String nome, String tipo,
@@ -110,7 +115,11 @@ public class Grupo {
         }
     }
 
+    @JsonIgnore
     public List<Usuario> getUsuariosRegistrados() {
+        if (membros == null) {
+            return new ArrayList<>();
+        }
         return new ArrayList<>(membros.keySet());
     }
 

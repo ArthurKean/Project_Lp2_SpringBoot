@@ -23,45 +23,59 @@ public class GrupoService {
     @Autowired
     private GrupoRepository repository;
 
-    public void registrarGrupo(Grupo grupo) {
+    @Autowired
+    private UsuarioService usuarioService;
+
+    public Grupo registrarGrupo(Grupo grupo) {
         if (grupo != null) {
-            repository.save(grupo);
+            if (grupo.getResponsavel() != null && grupo.getResponsavel().getId() != null) {
+                Usuario responsavel = usuarioService.buscarPorId(grupo.getResponsavel().getId());
+                if (responsavel instanceof Docente) {
+                    grupo.setResponsavel((Docente) responsavel);
+                }
+            }
+            Grupo salvo = repository.save(grupo);
             System.out.println("O grupo '" + grupo.getNome() + "' foi registrado no sistema.");
+            return salvo;
         } else {
-            System.out.println("Tentativa de registrar grupo inválido.");
+            System.out.println("Tentativa de registrar grupo inválido");
+            return null;
         }
     }
 
-    public void aprovarGrupo(Grupo grupo) {
+    public Grupo aprovarGrupo(Grupo grupo) {
         if (grupo != null) {
             grupo.alterarStatus(StatusGrupo.ATIVO);
-            repository.save(grupo);
+            Grupo salvo = repository.save(grupo);
             System.out.println("O grupo '" + grupo.getNome() + "' foi formalmente APROVADO.");
+            return salvo;
         }
+        return null;
     }
 
-    public void adicionarMembro(Grupo grupo, Usuario membro) {
+    public Grupo adicionarMembro(Grupo grupo, Usuario membro) {
         if (grupo != null && membro != null) {
             grupo.adicionarMembro(membro);
-            repository.save(grupo);
+            return repository.save(grupo);
         } else {
             System.out.println("Grupo ou Usuário inválido para adição.");
+            return null;
         }
     }
 
-    public void atribuirCargo(Grupo grupo, Usuario discente, Cargos cargo, Docente solicitante) {
+    public Grupo atribuirCargo(Grupo grupo, Usuario discente, Cargos cargo, Docente solicitante) {
         if (grupo == null || discente == null || solicitante == null) {
             System.out.println("Dados inválidos para alteração de cargo.");
-            return;
+            return null;
         }
         
         if (!grupo.getResponsavel().equals(solicitante)) {
             System.out.println("Apenas o Docente responsável ('" + grupo.getResponsavel().getNome() + "') pode alterar os cargos deste grupo.");
-            return;
+            return null;
         }
 
         grupo.atribuirCargo(discente, cargo);
-        repository.save(grupo);
+        return repository.save(grupo);
     }
 
     public List<Grupo> listarGruposAtivos() {
@@ -77,25 +91,28 @@ public class GrupoService {
         return ativos;
     }
 
-    public void listarTodosOsGrupos() {
+    public List<Grupo> listarTodosOsGrupos() {
         System.out.println("LISTA DE TODOS OS GRUPOS (Incluindo Inativos):");
         for (Grupo g : repository.findAll()) {
             System.out.println("Grupo: " + g.getNome() + " | Status: " + g.getStatus());
         }
+        return repository.findAll();
     }
 
-    public void solicitarCriacaoDeNovoGrupo(DiscenteDiretor alunoDiretor, Grupo novoGrupo) {
-        System.out.println("O aluno Diretor '" + alunoDiretor.getNome() + "' solicitou a criação do grupo '" + novoGrupo.getNome() + "'. Encaminhado para aprovação do coordenador.");
-
+    public String solicitarCriacaoDeNovoGrupo(DiscenteDiretor alunoDiretor, Grupo novoGrupo) {
+        String msg = "O aluno Diretor '" + alunoDiretor.getNome() + "' solicitou a criação do grupo '" + novoGrupo.getNome() + "'. Encaminhado para aprovação do coordenador.";
+        System.out.println(msg);
+        return msg;
     }
-    public void listarUsuariosdeUmGrupo(String listGrupo){
+    public List<Usuario> listarUsuariosdeUmGrupo(String listGrupo){
         for(Grupo g: repository.findAll()) {
             if(g.getNome().equalsIgnoreCase(listGrupo)){
                 g.listarMembros();
-                return;
+                return g.getUsuariosRegistrados();
             }
         }
         System.out.println("Grupo nao encontrado");
+        return new ArrayList<>();
     }
 
     public Grupo buscarGrupoPorNome(String nome){

@@ -22,12 +22,14 @@ public class AproveitamentoService {
     @Autowired
     private AproveitamentoRepository repository;
 
-    public void registrarAproveitamento(Aproveitamento solicitacao) {
+    public Aproveitamento registrarAproveitamento(Aproveitamento solicitacao) {
         if (solicitacao != null) {
-            repository.save(solicitacao);
+            Aproveitamento salvo = repository.save(solicitacao);
             System.out.println("A solicitação de aproveitamento de '" + solicitacao.getDiscente().getNome() + "' foi recebida e está PENDENTE.");
+            return salvo;
         } else {
             System.out.println("Erro: Requerimento inválido.");
+            return null;
         }
     }
 
@@ -100,14 +102,23 @@ public class AproveitamentoService {
         return false;
     }
 
-    public void verificarPrazo(Aproveitamento aproveitamento) {
+    public Aproveitamento buscarPorId(Long id) {
+        return repository.findById(id).orElse(null);
+    }
+
+    public String verificarPrazo(Aproveitamento aproveitamento) {
         if (aproveitamento != null && aproveitamento.getStatus() == StatusAproveitamento.PENDENTE) {
             long diasPendentes = ChronoUnit.DAYS.between(aproveitamento.getDataSolicitacao(), LocalDate.now());
             if (diasPendentes > 15) {
-                System.out.println("ALERTA: O requerimento de '" + aproveitamento.getDiscente().getNome() + "' está aguardando avaliação há " + diasPendentes + " dias! Passou do prazo de 15 dias.");
+                String msg = "ALERTA: O requerimento de '" + aproveitamento.getDiscente().getNome() + "' está aguardando avaliação há " + diasPendentes + " dias! Passou do prazo de 15 dias.";
+                System.out.println(msg);
+                return msg;
             } else {
-                System.out.println("O requerimento está dentro do prazo normal de avaliação (" + diasPendentes + " dias corridos).");
+                String msg = "O requerimento está dentro do prazo normal de avaliação (" + diasPendentes + " dias corridos).";
+                System.out.println(msg);
+                return msg;
             }
         }
+        return "Requerimento inválido ou não está pendente.";
     }
 }
