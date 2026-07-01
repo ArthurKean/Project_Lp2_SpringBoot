@@ -6,6 +6,7 @@ import com.ufma.project_lp2.model.Inscricao;
 import com.ufma.project_lp2.model.Usuario;
 import com.ufma.project_lp2.model.enums.StatusInscricao;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import com.ufma.project_lp2.repository.UsuarioRepository;
@@ -40,12 +41,7 @@ public class UsuarioService {
     }
 
     public Usuario buscarPorEmail(String email) {
-        for (Usuario u : repository.findAll()) {
-            if (u.getEmail().equalsIgnoreCase(email)) {
-                return u;
-            }
-        }
-        return null;
+        return repository.findByEmailIgnoreCase(email).orElse(null);
     }
 
     public Usuario buscarPorId(Long id) {
@@ -95,6 +91,7 @@ public class UsuarioService {
         }
     }
 
+    @Transactional
     public String substituirParticipante(Inscricao atual, Inscricao nova, String justificativa) {
         if (atual == null || nova == null) {
             System.out.println("Erro: inscrições inválidas.");

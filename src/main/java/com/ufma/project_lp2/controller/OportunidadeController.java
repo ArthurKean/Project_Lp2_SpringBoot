@@ -1,8 +1,11 @@
 package com.ufma.project_lp2.controller;
 
 import com.ufma.project_lp2.model.Oportunidade;
+import com.ufma.project_lp2.model.Usuario;
 import com.ufma.project_lp2.service.OportunidadeService;
+import com.ufma.project_lp2.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,13 +18,16 @@ public class OportunidadeController {
     private OportunidadeService oportunidadeService;
 
     @Autowired
-    private com.ufma.project_lp2.service.UsuarioService usuarioService;
+    private UsuarioService usuarioService;
 
     @PostMapping
-    public Oportunidade registrarOportunidade(@RequestBody Oportunidade oportunidade, @RequestParam String emailAutor) {
-        com.ufma.project_lp2.model.Usuario autor = usuarioService.buscarPorEmail(emailAutor);
+    public ResponseEntity<?> registrarOportunidade(@RequestBody Oportunidade oportunidade, @RequestParam String emailAutor) {
+        Usuario autor = usuarioService.buscarPorEmail(emailAutor);
+        if (autor == null) {
+            return ResponseEntity.status(404).body("Autor não encontrado com esse email.");
+        }
         oportunidade.setAutor(autor);
-        return oportunidadeService.registrarOportunidade(oportunidade);
+        return ResponseEntity.ok(oportunidadeService.registrarOportunidade(oportunidade));
     }
 
     @GetMapping
@@ -35,41 +41,43 @@ public class OportunidadeController {
     }
 
     @PutMapping("/{id}/fechar")
-    public Oportunidade fecharOportunidade(@PathVariable Long id) {
+    public ResponseEntity<?> fecharOportunidade(@PathVariable Long id) {
         for (Oportunidade op : oportunidadeService.listarOportunidades()) {
             if (op.getId() != null && op.getId().equals(id)) {
                 oportunidadeService.encerrarOportunidade(op);
-                return op;
+                return ResponseEntity.ok(op);
             }
         }
-        return null;
+        return ResponseEntity.status(404).body("Oportunidade " + id + " não existe.");
     }
 
     @PutMapping("/{id}/divulgar")
-    public Oportunidade divulgarOportunidade(@PathVariable Long id, @RequestParam String emailRequisitante) {
-        com.ufma.project_lp2.model.Usuario req = usuarioService.buscarPorEmail(emailRequisitante);
+    public ResponseEntity<?> divulgarOportunidade(@PathVariable Long id, @RequestParam String emailRequisitante) {
+        Usuario req = usuarioService.buscarPorEmail(emailRequisitante);
+        if (req == null) {
+            return ResponseEntity.status(404).body("Esse email não tá cadastrado no sistema.");
+        }
         for (Oportunidade op : oportunidadeService.listarOportunidades()) {
             if (op.getId() != null && op.getId().equals(id)) {
-                if (req != null) {
-                    oportunidadeService.divulgarOportunidade(op, req);
-                }
-                return op;
+                oportunidadeService.divulgarOportunidade(op, req);
+                return ResponseEntity.ok(op);
             }
         }
-        return null;
+        return ResponseEntity.status(404).body("Oportunidade " + id + " não existe.");
     }
 
     @PutMapping("/{id}/aprovar")
-    public Oportunidade aprovarOportunidade(@PathVariable Long id, @RequestParam String emailAvaliador) {
-        com.ufma.project_lp2.model.Usuario avaliador = usuarioService.buscarPorEmail(emailAvaliador);
+    public ResponseEntity<?> aprovarOportunidade(@PathVariable Long id, @RequestParam String emailAvaliador) {
+        Usuario avaliador = usuarioService.buscarPorEmail(emailAvaliador);
+        if (avaliador == null) {
+            return ResponseEntity.status(404).body("Avaliador não encontrado.");
+        }
         for (Oportunidade op : oportunidadeService.listarOportunidades()) {
             if (op.getId() != null && op.getId().equals(id)) {
-                if (avaliador != null) {
-                    oportunidadeService.aprovarOportunidade(op, avaliador);
-                }
-                return op;
+                oportunidadeService.aprovarOportunidade(op, avaliador);
+                return ResponseEntity.ok(op);
             }
         }
-        return null;
+        return ResponseEntity.status(404).body("Oportunidade " + id + " não existe.");
     }
 }

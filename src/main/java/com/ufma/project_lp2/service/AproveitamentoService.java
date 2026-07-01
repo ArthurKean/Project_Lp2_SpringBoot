@@ -24,6 +24,12 @@ public class AproveitamentoService {
 
     public Aproveitamento registrarAproveitamento(Aproveitamento solicitacao) {
         if (solicitacao != null) {
+            if (solicitacao.getStatus() == null) {
+                solicitacao.setStatus(StatusAproveitamento.PENDENTE);
+            }
+            if (solicitacao.getDataSolicitacao() == null) {
+                solicitacao.setDataSolicitacao(LocalDate.now());
+            }
             Aproveitamento salvo = repository.save(solicitacao);
             System.out.println("A solicitação de aproveitamento de '" + solicitacao.getDiscente().getNome() + "' foi recebida e está PENDENTE.");
             return salvo;
@@ -35,13 +41,9 @@ public class AproveitamentoService {
 
     public List<Aproveitamento> listarPendentes() {
         System.out.println("PAINEL DE APROVEITAMENTOS (PENDENTES):");
-        List<Aproveitamento> pendentes = new ArrayList<>();
-        
-        for (Aproveitamento ap : repository.findAll()) {
-            if (ap.getStatus() == StatusAproveitamento.PENDENTE) {
-                pendentes.add(ap);
-                System.out.println("- Aluno: " + ap.getDiscente().getNome() + " | Horas: " + ap.getHoras() + "h | Data: " + ap.getDataSolicitacao());
-            }
+        List<Aproveitamento> pendentes = repository.findByStatus(StatusAproveitamento.PENDENTE);
+        for (Aproveitamento ap : pendentes) {
+            System.out.println("- Aluno: " + ap.getDiscente().getNome() + " | Horas: " + ap.getHoras() + "h | Data: " + ap.getDataSolicitacao());
         }
         return pendentes;
     }
@@ -60,12 +62,10 @@ public class AproveitamentoService {
     }
 
     public int calcularHorasAprovadas(Discente discente) {
-        int total = 0;
-        for (Aproveitamento ap : repository.findAll()) {
-            if (ap.getDiscente() != null && ap.getDiscente().getId().equals(discente.getId()) && ap.getStatus() == StatusAproveitamento.APROVADO) {
-                total += ap.getHoras();
-            }
-        }
+        int total = repository.findByDiscenteIdAndStatus(discente.getId(), StatusAproveitamento.APROVADO)
+                .stream()
+                .mapToInt(Aproveitamento::getHoras)
+                .sum();
         System.out.println("Total de horas extracurriculares validadas para " + discente.getNome() + ": " + total + " horas.");
         return total;
     }

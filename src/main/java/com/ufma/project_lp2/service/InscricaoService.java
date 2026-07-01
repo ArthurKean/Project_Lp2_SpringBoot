@@ -81,13 +81,9 @@ public class InscricaoService {
 
     public List<Inscricao> listarInscritos(Oportunidade oportunidade) {
         System.out.println("LISTA DE INSCRITOS NA OPORTUNIDADE: " + oportunidade.getTitulo());
-        List<Inscricao> filtradas = new ArrayList<>();
-        
-        for (Inscricao inscricao : repository.findAll()) {
-            if (inscricao.getOportunidade() != null && inscricao.getOportunidade().getId() != null && inscricao.getOportunidade().getId().equals(oportunidade.getId())) {
-                filtradas.add(inscricao);
-                System.out.println("- Aluno: " + inscricao.getDiscente().getNome() + " | Status: " + inscricao.getStatus() + " | Motivação: " + inscricao.getMotivacao());
-            }
+        List<Inscricao> filtradas = repository.findByOportunidadeId(oportunidade.getId());
+        for (Inscricao inscricao : filtradas) {
+            System.out.println("- Aluno: " + inscricao.getDiscente().getNome() + " | Status: " + inscricao.getStatus() + " | Motivação: " + inscricao.getMotivacao());
         }
         return filtradas;
     }

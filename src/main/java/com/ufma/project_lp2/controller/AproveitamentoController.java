@@ -2,6 +2,7 @@ package com.ufma.project_lp2.controller;
 
 import com.ufma.project_lp2.service.AproveitamentoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import com.ufma.project_lp2.model.Aproveitamento;
@@ -20,12 +21,17 @@ public class AproveitamentoController {
     private UsuarioService usuarioService;
 
     @PostMapping
-    public Aproveitamento registrarAproveitamento(@RequestBody Aproveitamento solicitacao, @RequestParam String emailDiscente) {
+    public ResponseEntity<?> registrarAproveitamento(@RequestBody Aproveitamento solicitacao,
+                                                     @RequestParam String emailDiscente) {
         Usuario discente = usuarioService.buscarPorEmail(emailDiscente);
-        if (discente instanceof Discente) {
-            solicitacao.setDiscente((Discente) discente);
+        if (discente == null) {
+            return ResponseEntity.status(404).body("Esse email não tá cadastrado no sistema.");
         }
-        return aproveitamentoService.registrarAproveitamento(solicitacao);
+        if (!(discente instanceof Discente)) {
+            return ResponseEntity.badRequest().body(discente.getNome() + " não é um discente.");
+        }
+        solicitacao.setDiscente((Discente) discente);
+        return ResponseEntity.ok(aproveitamentoService.registrarAproveitamento(solicitacao));
     }
 
     @GetMapping("/pendentes")
@@ -34,37 +40,67 @@ public class AproveitamentoController {
     }
 
     @PutMapping("/{id}/aprovar")
-    public boolean aprovarSolicitacao(@PathVariable Long id, @RequestParam String emailAvaliador) {
+    public ResponseEntity<String> aprovarSolicitacao(@PathVariable Long id, @RequestParam String emailAvaliador) {
         Aproveitamento ap = aproveitamentoService.buscarPorId(id);
+        if (ap == null) {
+            return ResponseEntity.status(404).body("Aproveitamento " + id + " não encontrado.");
+        }
         Usuario avaliador = usuarioService.buscarPorEmail(emailAvaliador);
-        return aproveitamentoService.aprovarSolicitacao(ap, avaliador);
+        if (avaliador == null) {
+            return ResponseEntity.status(404).body("Avaliador não encontrado.");
+        }
+        boolean ok = aproveitamentoService.aprovarSolicitacao(ap, avaliador);
+        return ok ? ResponseEntity.ok("Aproveitamento aprovado!") :
+                    ResponseEntity.badRequest().body("Não foi possível aprovar. Verifique o status da solicitação.");
     }
 
     @PutMapping("/{id}/rejeitar")
-    public boolean rejeitarSolicitacao(@PathVariable Long id, @RequestParam String emailAvaliador, @RequestParam String motivo) {
+    public ResponseEntity<String> rejeitarSolicitacao(@PathVariable Long id,
+                                                      @RequestParam String emailAvaliador,
+                                                      @RequestParam String motivo) {
         Aproveitamento ap = aproveitamentoService.buscarPorId(id);
+        if (ap == null) {
+            return ResponseEntity.status(404).body("Aproveitamento " + id + " não encontrado.");
+        }
         Usuario avaliador = usuarioService.buscarPorEmail(emailAvaliador);
-        return aproveitamentoService.rejeitarSolicitacao(ap, avaliador, motivo);
+        if (avaliador == null) {
+            return ResponseEntity.status(404).body("Avaliador não encontrado.");
+        }
+        boolean ok = aproveitamentoService.rejeitarSolicitacao(ap, avaliador, motivo);
+        return ok ? ResponseEntity.ok("Aproveitamento rejeitado.") :
+                    ResponseEntity.badRequest().body("Não foi possível rejeitar. Verifique o status da solicitação.");
     }
 
     @PutMapping("/{id}/reenviar")
-    public boolean reenviarSolicitacao(@PathVariable Long id, @RequestParam String novoCertificadoPath) {
+    public ResponseEntity<String> reenviarSolicitacao(@PathVariable Long id,
+                                                      @RequestParam String novoCertificadoPath) {
         Aproveitamento ap = aproveitamentoService.buscarPorId(id);
-        return aproveitamentoService.reenviarSolicitacao(ap, novoCertificadoPath);
+        if (ap == null) {
+            return ResponseEntity.status(404).body("Aproveitamento " + id + " não encontrado.");
+        }
+        boolean ok = aproveitamentoService.reenviarSolicitacao(ap, novoCertificadoPath);
+        return ok ? ResponseEntity.ok("Solicitação reenviada!") :
+                    ResponseEntity.badRequest().body("Só dá pra reenviar solicitações que foram rejeitadas.");
     }
 
     @GetMapping("/horas/{emailDiscente}")
-    public int calcularHorasAprovadas(@PathVariable String emailDiscente) {
+    public ResponseEntity<?> calcularHorasAprovadas(@PathVariable String emailDiscente) {
         Usuario discente = usuarioService.buscarPorEmail(emailDiscente);
-        if (discente instanceof Discente) {
-            return aproveitamentoService.calcularHorasAprovadas((Discente) discente);
+        if (discente == null) {
+            return ResponseEntity.status(404).body("Discente não encontrado.");
         }
-        return 0;
+        if (!(discente instanceof Discente)) {
+            return ResponseEntity.badRequest().body(discente.getNome() + " não é um discente.");
+        }
+        return ResponseEntity.ok(aproveitamentoService.calcularHorasAprovadas((Discente) discente));
     }
 
     @GetMapping("/{id}/prazo")
-    public String verificarPrazo(@PathVariable Long id) {
+    public ResponseEntity<String> verificarPrazo(@PathVariable Long id) {
         Aproveitamento ap = aproveitamentoService.buscarPorId(id);
-        return aproveitamentoService.verificarPrazo(ap);
+        if (ap == null) {
+            return ResponseEntity.status(404).body("Aproveitamento " + id + " não encontrado.");
+        }
+        return ResponseEntity.ok(aproveitamentoService.verificarPrazo(ap));
     }
 }

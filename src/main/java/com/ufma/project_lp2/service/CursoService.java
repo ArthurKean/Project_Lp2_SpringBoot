@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import com.ufma.project_lp2.repository.CursoRepository;
+import com.ufma.project_lp2.repository.DiscenteRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,9 @@ public class CursoService {
 
     @Autowired
     private CursoRepository repository;
+
+    @Autowired
+    private DiscenteRepository discenteRepository;
 
     public void cadastrarCurso(Curso curso) {
         if (curso == null) {
@@ -112,7 +116,8 @@ public class CursoService {
         }
         
         curso.adicionarDiscente(discente);
-        repository.save(curso);
+        discente.setCurso(curso);
+        discenteRepository.save(discente);
         System.out.println("Matrícula confirmada! O aluno '" + discente.getNome() + "' está oficialmente matriculado no curso '" + curso.getNome() + "'.");
     }
 

@@ -15,8 +15,6 @@ import com.ufma.project_lp2.repository.GrupoRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 @Service
 @Transactional
@@ -30,10 +28,20 @@ public class GrupoService {
 
     public Grupo registrarGrupo(Grupo grupo) {
         if (grupo != null) {
-            if (grupo.getResponsavel() != null && grupo.getResponsavel().getId() != null) {
-                Usuario responsavel = usuarioService.buscarPorId(grupo.getResponsavel().getId());
+            if (grupo.getResponsavel() != null) {
+                Usuario responsavel = null;
+
+                if (grupo.getResponsavel().getId() != null) {
+                    responsavel = usuarioService.buscarPorId(grupo.getResponsavel().getId());
+                } else if (grupo.getResponsavel().getEmail() != null) {
+                    responsavel = usuarioService.buscarPorEmail(grupo.getResponsavel().getEmail());
+                }
+
                 if (responsavel instanceof Docente) {
                     grupo.setResponsavel((Docente) responsavel);
+                } else {
+                    System.out.println("Responsavel informado nao e um docente valido.");
+                    return null;
                 }
             }
             Grupo salvo = repository.save(grupo);
@@ -92,23 +100,20 @@ public class GrupoService {
 
     public List<Grupo> listarGruposAtivos() {
         System.out.println("CATÁLOGO DE GRUPOS ATIVOS:");
-        List<Grupo> ativos = new ArrayList<>();
-        
-        for (Grupo g : repository.findAll()) {
-            if (g.getStatus() == StatusGrupo.ATIVO) {
-                ativos.add(g);
-                System.out.println("- Grupo: " + g.getNome() + " | Área: " + g.getTipo() + " | Professor Chefe: " + g.getResponsavel().getNome());
-            }
+        List<Grupo> ativos = repository.findByStatus(StatusGrupo.ATIVO);
+        for (Grupo g : ativos) {
+            System.out.println("- Grupo: " + g.getNome() + " | Área: " + g.getTipo() + " | Professor Chefe: " + g.getResponsavel().getNome());
         }
         return ativos;
     }
 
     public List<Grupo> listarTodosOsGrupos() {
         System.out.println("LISTA DE TODOS OS GRUPOS (Incluindo Inativos):");
-        for (Grupo g : repository.findAll()) {
+        List<Grupo> todos = repository.findAll();
+        for (Grupo g : todos) {
             System.out.println("Grupo: " + g.getNome() + " | Status: " + g.getStatus());
         }
-        return repository.findAll();
+        return todos;
     }
 
     public String solicitarCriacaoDeNovoGrupo(DiscenteDiretor alunoDiretor, Grupo novoGrupo) {
@@ -116,23 +121,20 @@ public class GrupoService {
         System.out.println(msg);
         return msg;
     }
-    public List<Usuario> listarUsuariosdeUmGrupo(String listGrupo){
-        for(Grupo g: repository.findAll()) {
-            if(g.getNome().equalsIgnoreCase(listGrupo)){
-                g.listarMembros();
-                return g.getUsuariosRegistrados();
-            }
-        }
-        System.out.println("Grupo nao encontrado");
-        return new ArrayList<>();
+
+    public List<Usuario> listarUsuariosdeUmGrupo(String nomeGrupo) {
+        return repository.findByNomeIgnoreCase(nomeGrupo)
+                .map(g -> {
+                    g.listarMembros();
+                    return g.getUsuariosRegistrados();
+                })
+                .orElseGet(() -> {
+                    System.out.println("Grupo nao encontrado");
+                    return new ArrayList<>();
+                });
     }
 
-    public Grupo buscarGrupoPorNome(String nome){
-        for(Grupo g: repository.findAll()){
-            if(g.getNome().equalsIgnoreCase(nome)){
-                return g;
-            }
-        }
-        return null;
+    public Grupo buscarGrupoPorNome(String nome) {
+        return repository.findByNomeIgnoreCase(nome).orElse(null);
     }
 }

@@ -32,13 +32,9 @@ public class CertificadoService {
 
     public List<Certificado> listarMeusCertificados(Discente alunoLogado) {
         System.out.println("MEUS CERTIFICADOS (ALUNO: " + alunoLogado.getNome() + "):");
-        List<Certificado> meusCertificados = new ArrayList<>();
-        
-        for (Certificado c : repository.findAll()) {
-            if (c.getDiscente() != null && c.getDiscente().getId().equals(alunoLogado.getId())) {
-                meusCertificados.add(c);
-                System.out.println("- Documento: " + c.getOportunidade().getTitulo() + " | Validação: " + c.getUuidHash());
-            }
+        List<Certificado> meusCertificados = repository.findByDiscenteId(alunoLogado.getId());
+        for (Certificado c : meusCertificados) {
+            System.out.println("- Documento: " + c.getOportunidade().getTitulo() + " | Validação: " + c.getUuidHash());
         }
         return meusCertificados;
     }
@@ -65,15 +61,16 @@ public class CertificadoService {
 
     public boolean consultarAutenticidadeNaUFMA(String codigoDeHash) {
         System.out.println("\nSISTEMA DE VALIDAÇÃO UFMA - Consultando: " + codigoDeHash);
-        for (Certificado c : repository.findAll()) {
-            if (c.getUuidHash().equals(codigoDeHash)) {
-                System.out.println("Certificado VÁLIDO. Pertence ao aluno: " + c.getDiscente().getNome());
-                c.gerarQRCode();
-                repository.save(c);
-                return true;
-            }
-        }
-        System.out.println("Certificado FALSO ou não encontrado no sistema.");
-        return false;
+        return repository.findByUuidHash(codigoDeHash)
+                .map(c -> {
+                    System.out.println("Certificado VÁLIDADDO > Pertence ao aluno: " + c.getDiscente().getNome());
+                    c.gerarQRCode();
+                    repository.save(c);
+                    return true;
+                })
+                .orElseGet(() -> {
+                    System.out.println("Certificado FALSO ou não encontrado no sistema.");
+                    return false;
+                });
     }
 }

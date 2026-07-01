@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.ufma.project_lp2.repository.OportunidadeRepository;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -46,12 +46,10 @@ public class OportunidadeService {
 
     public List<Oportunidade> listarOportunidadesAbertas() {
         System.out.println("OPORTUNIDADES DISPONÍVEIS PARA INSCRIÇÃO:");
-        List<Oportunidade> abertas = new ArrayList<>();
-        for (Oportunidade op : repository.findAll()) {
-            if (op.getStatus() == StatusOportunidade.PUBLICADA || op.getStatus() == StatusOportunidade.ABERTA) {
-                abertas.add(op);
-                System.out.println("- Projeto: " + op.getTitulo() + " | Vagas Restantes: " + op.getVagas());
-            }
+        List<Oportunidade> abertas = repository.findByStatusIn(
+                Arrays.asList(StatusOportunidade.PUBLICADA, StatusOportunidade.ABERTA));
+        for (Oportunidade op : abertas) {
+            System.out.println("- Projeto: " + op.getTitulo() + " | Vagas Restantes: " + op.getVagas());
         }
         return abertas;
     }
@@ -123,11 +121,11 @@ public class OportunidadeService {
     }
 
     public Oportunidade buscarPorTitulo(String titulo) {
-        for (Oportunidade op : repository.findAll()) {
-            if (op.getTitulo().equalsIgnoreCase(titulo)) {
-                return op;
-            }
-        }
-        return null;
+        return repository.findByTituloIgnoreCase(titulo).orElse(null);
+    }
+
+    public Oportunidade buscarPorId(Long id) {
+        return repository.findById(id).orElse(null);
     }
 }
+

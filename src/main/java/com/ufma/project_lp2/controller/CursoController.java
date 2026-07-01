@@ -10,6 +10,7 @@ import com.ufma.project_lp2.model.enums.StatusMatricula;
 import com.ufma.project_lp2.service.UsuarioService;
 
 import java.util.List;
+import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/api/cursos")
@@ -19,8 +20,12 @@ public class CursoController {
     private CursoService cursoService;
 
     @PostMapping
-    public void cadastrarCurso(@RequestBody Curso curso) {
+    public ResponseEntity<String> cadastrarCurso(@RequestBody Curso curso) {
+        if (cursoService.buscarPorCodigo(curso.getCodigo()) != null) {
+            return ResponseEntity.badRequest().body("Esse código de curso já tá cadastrado.");
+        }
         cursoService.cadastrarCurso(curso);
+        return ResponseEntity.ok("Curso cadastrado!!!!");
     }
 
     @GetMapping
@@ -34,8 +39,12 @@ public class CursoController {
     }
 
     @DeleteMapping("/{codigo}")
-    public void removerCurso(@PathVariable int codigo) {
+    public ResponseEntity<String> removerCurso(@PathVariable int codigo) {
+        if (cursoService.buscarPorCodigo(codigo) == null) {
+            return ResponseEntity.status(404).body("Curso não encontrado.");
+        }
         cursoService.removerCurso(codigo);
+        return ResponseEntity.ok("Curso removido.");
     }
 
     @PutMapping("/{codigo}/ppc")
@@ -48,11 +57,21 @@ public class CursoController {
     private UsuarioService usuarioService;
 
     @PutMapping("/{codigo}/matricular")
-    public void matricularDiscente(@PathVariable int codigo, @RequestParam String emailDiscente) {
+    public ResponseEntity<String> matricularDiscente(@PathVariable int codigo, @RequestParam String emailDiscente) {
         Usuario u = usuarioService.buscarPorEmail(emailDiscente);
-        if (u instanceof Discente) {
-            cursoService.matricularDiscente(codigo, (Discente) u);
+
+        if (u == null) {
+            return ResponseEntity.status(404).body("Esse email não tá cadastrado no sistema.");
         }
+        if (!(u instanceof Discente)) {
+            return ResponseEntity.badRequest().body(u.getNome() + " não é um discente.");
+        }
+        if (cursoService.buscarPorCodigo(codigo) == null) {
+            return ResponseEntity.status(404).body("Curso " + codigo + " não encontrado.");
+        }
+
+        cursoService.matricularDiscente(codigo, (Discente) u);
+        return ResponseEntity.ok(u.getNome() + " matriculado(a) no curso!");
     }
 
     @GetMapping("/{codigo}/alunos/status")
