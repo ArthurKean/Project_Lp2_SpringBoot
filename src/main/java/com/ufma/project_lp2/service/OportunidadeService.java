@@ -22,12 +22,14 @@ public class OportunidadeService {
     @Autowired
     private OportunidadeRepository repository;
 
-    public void registrarOportunidade(Oportunidade oportunidade) {
+    public Oportunidade registrarOportunidade(Oportunidade oportunidade) {
         if (oportunidade != null) {
-            repository.save(oportunidade);
+            Oportunidade salva = repository.save(oportunidade);
             System.out.println("A oportunidade '" + oportunidade.getTitulo() + "' foi criada e salva!");
+            return salva;
         } else {
             System.out.println("Tentativa de registrar uma oportunidade inválida!");
+            return null;
         }
     }
 

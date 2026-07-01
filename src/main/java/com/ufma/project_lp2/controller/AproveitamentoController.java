@@ -20,7 +20,11 @@ public class AproveitamentoController {
     private UsuarioService usuarioService;
 
     @PostMapping
-    public Aproveitamento registrarAproveitamento(@RequestBody Aproveitamento solicitacao) {
+    public Aproveitamento registrarAproveitamento(@RequestBody Aproveitamento solicitacao, @RequestParam String emailDiscente) {
+        Usuario discente = usuarioService.buscarPorEmail(emailDiscente);
+        if (discente instanceof Discente) {
+            solicitacao.setDiscente((Discente) discente);
+        }
         return aproveitamentoService.registrarAproveitamento(solicitacao);
     }
 

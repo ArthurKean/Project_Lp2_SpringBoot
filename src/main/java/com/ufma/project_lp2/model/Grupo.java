@@ -115,6 +115,10 @@ public class Grupo {
         }
     }
 
+    public List<String> getHistoricoUsuarios() {
+        return historicoUsuarios;
+    }
+
     @JsonIgnore
     public List<Usuario> getUsuariosRegistrados() {
         if (membros == null) {

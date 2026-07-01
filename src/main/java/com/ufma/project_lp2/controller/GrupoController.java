@@ -88,4 +88,13 @@ public class GrupoController {
         }
         return "Erro: Usuário não é um Discente Diretor válido.";
     }
+
+    @GetMapping("/{nome}/historico")
+    public List<String> listarHistorico(@PathVariable String nome) {
+        Grupo grupo = grupoService.buscarGrupoPorNome(nome);
+        if (grupo != null) {
+            return grupo.getHistoricoUsuarios();
+        }
+        return null;
+    }
 }

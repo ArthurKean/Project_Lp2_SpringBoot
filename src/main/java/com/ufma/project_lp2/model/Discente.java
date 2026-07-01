@@ -16,7 +16,7 @@ public class Discente extends Usuario{
     private Curso curso;
 
     @Enumerated(EnumType.STRING)
-    private StatusMatricula statusMatricula;
+    private StatusMatricula statusMatricula = StatusMatricula.ATIVO;
 
     public Discente() {
     }
@@ -43,10 +43,10 @@ public class Discente extends Usuario{
         this.matricula = matricula;
     }
 
-    public int getSemestre_atual() {
+    public int getSemestreAtual() {
         return semestreAtual;
     }
-    public void setSemestre_atual(int semestreAtual) {
+    public void setSemestreAtual(int semestreAtual) {
         this.semestreAtual = semestreAtual;
     }
 

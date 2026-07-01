@@ -26,7 +26,27 @@ public class CertificadoController {
     private OportunidadeService oportunidadeService;
 
     @PostMapping
-    public Certificado guardarCertificado(@RequestBody Certificado certificado) {
+    public Certificado guardarCertificado(@RequestBody Certificado certificado, 
+                                          @RequestParam String emailDiscente, 
+                                          @RequestParam String tituloOportunidade) {
+        Usuario discente = usuarioService.buscarPorEmail(emailDiscente);
+        Oportunidade op = oportunidadeService.buscarPorTitulo(tituloOportunidade);
+        
+        if (discente instanceof Discente) {
+            certificado.setDiscente((Discente) discente);
+        }
+        certificado.setOportunidade(op);
+        
+        if (certificado.getUuidHash() == null) {
+            certificado.setUuidHash(java.util.UUID.randomUUID().toString());
+        }
+        if (certificado.getDataEmissao() == null) {
+            certificado.setDataEmissao(java.time.LocalDate.now());
+        }
+        if (certificado.getStatusAssinatura() == null) {
+            certificado.setStatusAssinatura(com.ufma.project_lp2.model.enums.StatusAssinatura.PENDENTE);
+        }
+
         return certificadoService.guardarRegistroDeCertificadoOficial(certificado);
     }
 

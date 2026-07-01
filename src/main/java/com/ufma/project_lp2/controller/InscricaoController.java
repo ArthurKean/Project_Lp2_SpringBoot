@@ -57,4 +57,11 @@ public class InscricaoController {
         Oportunidade op = oportunidadeService.buscarPorTitulo(tituloOportunidade);
         return inscricaoService.listarInscritos(op);
     }
+
+    @PutMapping("/{idAtual}/substituir/{idNova}")
+    public String substituirParticipante(@PathVariable Long idAtual, @PathVariable Long idNova, @RequestParam String justificativa) {
+        Inscricao atual = inscricaoService.buscarPorId(idAtual);
+        Inscricao nova = inscricaoService.buscarPorId(idNova);
+        return usuarioService.substituirParticipante(atual, nova, justificativa);
+    }
 }

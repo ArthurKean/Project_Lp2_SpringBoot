@@ -32,7 +32,7 @@ public class Oportunidade {
     private int vagas;
 
     @Enumerated(EnumType.STRING)
-    private StatusOportunidade status;
+    private StatusOportunidade status = StatusOportunidade.RASCUNHO;
 
     private LocalDate inicio;
     private LocalDate fim;
@@ -97,12 +97,22 @@ public class Oportunidade {
     public TipoOportunidade getTipo() {
         return tipo;
     }
+    public void setTipo(TipoOportunidade tipo) {
+        this.tipo = tipo;
+    }
+
     public Modalidade getModalidade() {
         return modalidade;
+    }
+    public void setModalidade(Modalidade modalidade) {
+        this.modalidade = modalidade;
     }
 
     public int getCarga_horaria() {
         return carga_horaria;
+    }
+    public void setCarga_horaria(int carga_horaria) {
+        this.carga_horaria = carga_horaria;
     }
 
     public int getVagas() {
@@ -122,12 +132,22 @@ public class Oportunidade {
     public LocalDate getInicio() {
         return inicio;
     }
+    public void setInicio(LocalDate inicio) {
+        this.inicio = inicio;
+    }
+
     public LocalDate getFim() {
         return fim;
+    }
+    public void setFim(LocalDate fim) {
+        this.fim = fim;
     }
 
     public Usuario getAutor() {
         return autor;
+    }
+    public void setAutor(Usuario autor) {
+        this.autor = autor;
     }
 
     public Docente getResponsavel() {
