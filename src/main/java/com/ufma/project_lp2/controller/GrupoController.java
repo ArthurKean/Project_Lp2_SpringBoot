@@ -60,6 +60,13 @@ public class GrupoController {
         return grupoService.adicionarMembro(grupo, membro);
     }
 
+    @DeleteMapping("/{nome}/membros/{email}")
+    public Grupo removerMembro(@PathVariable String nome, @PathVariable String email) {
+        Grupo grupo = grupoService.buscarGrupoPorNome(nome);
+        Usuario membro = usuarioService.buscarPorEmail(email);
+        return grupoService.removerMembro(grupo, membro);
+    }
+
     @PutMapping("/{nome}/cargos")
     public Grupo atribuirCargo(
             @PathVariable String nome,

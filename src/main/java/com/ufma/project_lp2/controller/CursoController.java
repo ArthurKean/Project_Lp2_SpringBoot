@@ -64,4 +64,13 @@ public class CursoController {
     public int totalDeAlunos(@PathVariable int codigo) {
         return cursoService.totalDeAlunos(codigo);
     }
+
+    @GetMapping("/{codigo}/historico-ppc")
+    public List<String> listarHistoricoPpc(@PathVariable int codigo) {
+        Curso curso = cursoService.buscarPorCodigo(codigo);
+        if (curso != null) {
+            return curso.getHistoricoPpc();
+        }
+        return null;
+    }
 }

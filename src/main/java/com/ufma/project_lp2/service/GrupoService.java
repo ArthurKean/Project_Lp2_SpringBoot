@@ -8,6 +8,7 @@ import com.ufma.project_lp2.model.Usuario;
 import com.ufma.project_lp2.model.enums.Cargos;
 import com.ufma.project_lp2.model.enums.StatusGrupo;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import com.ufma.project_lp2.repository.GrupoRepository;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @Service
+@Transactional
 public class GrupoService {
 
     @Autowired
@@ -59,6 +61,16 @@ public class GrupoService {
             return repository.save(grupo);
         } else {
             System.out.println("Grupo ou Usuário inválido para adição.");
+            return null;
+        }
+    }
+
+    public Grupo removerMembro(Grupo grupo, Usuario membro) {
+        if (grupo != null && membro != null) {
+            grupo.removerMembro(membro);
+            return repository.save(grupo);
+        } else {
+            System.out.println("Grupo ou Usuário inválido para remoção.");
             return null;
         }
     }

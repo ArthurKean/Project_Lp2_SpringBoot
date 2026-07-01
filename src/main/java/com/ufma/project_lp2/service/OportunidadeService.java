@@ -9,6 +9,7 @@ import com.ufma.project_lp2.model.enums.Papel;
 import com.ufma.project_lp2.model.enums.StatusInscricao;
 import com.ufma.project_lp2.model.enums.StatusOportunidade;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import com.ufma.project_lp2.repository.OportunidadeRepository;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional
 public class OportunidadeService {
 
     @Autowired

@@ -3,6 +3,7 @@ package com.ufma.project_lp2.model;
 
 import com.ufma.project_lp2.model.enums.StatusMatricula;
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ public class Curso {
     private int cargaHoraria;
     private String versaoPpc;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "curso")
     private List<Discente> discentes;
 
@@ -64,6 +66,10 @@ public class Curso {
                 System.out.println("- " + registro);
             }
         }
+    }
+
+    public List<String> getHistoricoPpc() {
+        return historicoPpc;
     }
 
     public List<Discente> listarAlunosPorStatus(StatusMatricula status) {

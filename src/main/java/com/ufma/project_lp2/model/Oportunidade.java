@@ -2,6 +2,7 @@ package com.ufma.project_lp2.model;
 
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ufma.project_lp2.model.enums.Modalidade;
 import com.ufma.project_lp2.model.enums.StatusInscricao;
 import com.ufma.project_lp2.model.enums.StatusOportunidade;
@@ -47,6 +48,7 @@ public class Oportunidade {
 
     private String planoAtividades;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "oportunidade")
     private List<Inscricao> inscricoes;
 
