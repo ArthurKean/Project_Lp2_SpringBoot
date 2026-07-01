@@ -68,7 +68,7 @@ public class Grupo {
 
     public void adicionarMembro(Usuario membro) {
         if (membro != null && !this.membros.containsKey(membro)) {
-            this.membros.put(membro, Cargos.MEMBRO); // Cargo padrão ao entrar
+            this.membros.put(membro, Cargos.MEMBRO);
             this.historicoUsuarios.add("Membro " + membro.getNome() + " ingressou em " + LocalDate.now());
             System.out.println("Membro " + membro.getNome() + " foi adicionado com sucesso ao grupo " + nome + " como MEMBRO.");
         } else {

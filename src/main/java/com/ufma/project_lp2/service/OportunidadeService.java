@@ -82,7 +82,7 @@ public class OportunidadeService {
 
     public void encerrarOportunidade(Oportunidade oportunidade) {
         if (oportunidade != null) {
-            oportunidade.encerrar(); // Chamando a lógica da própria classe Oportunidade
+            oportunidade.encerrar();
             repository.save(oportunidade);
             System.out.println("A oportunidade '" + oportunidade.getTitulo() + "' foi ENCERRADA com sucesso");
         }

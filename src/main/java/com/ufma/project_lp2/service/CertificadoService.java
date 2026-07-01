@@ -55,7 +55,7 @@ public class CertificadoService {
                 System.out.println("- Certificado emitido para: " + inscricao.getDiscente().getNome() + " | Hash: " + cert.getUuidHash());
             }
         }
-        System.out.println("Total de certificados emitidos: " + lote.size());
+        System.out.println("Total de certificados emitidas: " + lote.size());
         return lote;
     }
 

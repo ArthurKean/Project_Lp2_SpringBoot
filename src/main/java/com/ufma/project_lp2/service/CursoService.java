@@ -51,7 +51,7 @@ public class CursoService {
             return;
         }
         System.out.println("REVISÃO INSTITUCIONAL: Iniciando atualização do PPC do curso '" + curso.getNome() + "'...");
-        curso.atualizarPPC(novasCargaHoraria, novaVersao); // Chama o método da classe Curso
+        curso.atualizarPPC(novasCargaHoraria, novaVersao);
         repository.save(curso);
         System.out.println("Atualização do PPC concluída no sistema");
     }
